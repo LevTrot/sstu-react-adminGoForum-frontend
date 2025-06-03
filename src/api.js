@@ -49,7 +49,7 @@ api.interceptors.request.use(async config => {
             if (!isRefreshing) {
                 isRefreshing = true;
                 try {
-                    const { data } = await authApi.post('/refresh', { refresh_token: refresh });
+                    const { data } = await authApi.post('api/refresh', { refresh_token: refresh });
                     const { access_token: newAccess, refresh_token: newRefresh } = data;
                     localStorage.setItem('access_token', newAccess);
                     localStorage.setItem('refresh_token', newRefresh);
@@ -92,10 +92,10 @@ export const refreshToken = refreshTokenValue =>
 
 // Основное API на 8080
 export const getAllTopics = () =>
-    api.get('/topics');
+    api.get('api/topics');
 
 export const createTopic = (title, description) =>
-    api.post('/topics/create', { title, description });
+    api.post('api/topics/create', { title, description });
 
 export const getAllPosts = () =>
     api.get('/posts/all');
@@ -107,16 +107,17 @@ export const createPost = (topicId, title, content) =>
     api.post('/posts/create', { topic_id: parseInt(topicId), title, content });
 
 export const getCommentsByPost = (postId) =>
-    api.get(`/comments?post_id=${postId}`);
+    api.get(`api/comments?post_id=${postId}`);
 
 export const createComment = (postId, content) =>
-    api.post('/comments/create', { post_id: parseInt(postId), content });
+    api.post('api/comments/create', { post_id: parseInt(postId), content });
 
 export const getAllMessages = async (token) => {
     try {
         const res = await axios.get(`${API_BASE_URL}/chat/messages`, {
             headers: { Authorization: `Bearer ${token}` }
         });
+        console.log("Res.data в api.js getAllMessages: ", res.data)
         return res.data;
     } catch (err) {
         console.error('Ошибка при загрузке сообщений:', err);
@@ -125,13 +126,13 @@ export const getAllMessages = async (token) => {
 };
 
 export const deleteTopic = (id) =>
-    api.delete('/topics/delete', { params: { id } });
+    api.delete('api/topics/delete', { params: { id } });
 
 export const deletePost = id =>
     api.delete('/posts/delete', { params: { post_id: id } })
 
 export const deleteComment = id =>
-    api.delete('/comments/delete', { params: { comment_id: id } })
+    api.delete('api/comments/delete', { params: { comment_id: id } })
 
 
 export default api;

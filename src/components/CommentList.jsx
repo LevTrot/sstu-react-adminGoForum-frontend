@@ -1,99 +1,43 @@
 // src/components/CommentList.jsx
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-//import { getCommentsByPost, createComment, getPostsByTopic, deleteComment, parseJwt } from '../api'
+import { getCommentsByPost, createComment, getPostsByTopic, deleteComment, parseJwt } from '../api'
 
 function CommentList() {
     const { postId, topicId } = useParams()
     const [post, setPost] = useState(null)
     const [comments, setComments] = useState([])
     const [newContent, setNewContent] = useState('')
-    // const token = localStorage.getItem('access_token')
-    // const decoded = token ? parseJwt(token) : null
-    // const isAdmin = decoded?.role === 'ADMIN'
-    const isAdmin = true
+    const token = localStorage.getItem('access_token')
+    const decoded = token ? parseJwt(token) : null
+    const isAdmin = decoded?.role === 'ADMIN'
 
     useEffect(() => {
-        // Заглушка поста
-        const fakePost = {
-            id: parseInt(postId, 10),
-            title: 'Пример поста',
-            content: 'Это содержимое поста.\nС переносами строк.',
-            timestamp: new Date().toISOString(),
+        async function fetchData() {
+            const postRes = await getPostsByTopic(topicId)
+            const found = postRes.data.data.find(p => p.id === parseInt(postId, 10))
+            setPost(found)
+            const cmRes = await getCommentsByPost(postId)
+            setComments(cmRes.data.data || [])
         }
-        setPost(fakePost)
-
-        // Заглушки комментариев
-        const fakeComments = [
-            {
-                id: 1,
-                username: 'User1',
-                content: 'Комментарий 1',
-                timestamp: new Date().toISOString(),
-            },
-            {
-                id: 2,
-                username: 'User2',
-                content: 'Комментарий 2',
-                timestamp: new Date().toISOString(),
-            },
-            {
-                id: 3,
-                username: 'User2',
-                content: 'Комментарий 2',
-                timestamp: new Date().toISOString(),
-            },
-            {
-                id: 4,
-                username: 'User2',
-                content: 'Комментарий 2',
-                timestamp: new Date().toISOString(),
-            },
-            {
-                id: 5,
-                username: 'User2',
-                content: 'Комментарий 2',
-                timestamp: new Date().toISOString(),
-            },
-        ]
-        setComments(fakeComments)
+        fetchData()
     }, [postId, topicId])
-
-    // const handleCreateComment = async e => {
-    //     e.preventDefault()
-    //     if (newContent.trim()) {
-    //         await createComment(postId, newContent)
-    //         setNewContent('')
-    //         const res = await getCommentsByPost(postId)
-    //         setComments(res.data || [])
-    //     }
-    // }
 
     const handleCreateComment = async e => {
         e.preventDefault()
         if (newContent.trim()) {
-            const newComment = {
-                id: Date.now(),
-                username: 'Вы',
-                content: newContent,
-                timestamp: new Date().toISOString(),
-            }
-            setComments(prev => [...prev, newComment])
+            await createComment(postId, newContent)
             setNewContent('')
+            const res = await getCommentsByPost(postId)
+            setComments(res.data.data || [])
         }
     }
 
-    // const handleDeleteComment = async id => {
-    //     if (window.confirm('Удалить комментарий?')) {
-    //         await deleteComment(id)
-    //         const res = await getCommentsByPost(postId)
-    //         setComments(res.data || [])
-    //     }
-    // }
-
     const handleDeleteComment = async id => {
         if (window.confirm('Удалить комментарий?')) {
-            setComments(prev => prev.filter(c => c.id !== id))
+            await deleteComment(id)
+            const res = await getCommentsByPost(postId)
+            setComments(res.data.data || [])
         }
     }
 

@@ -1,7 +1,6 @@
 // src/components/TopicList.jsx
 import React, { useState, useEffect } from 'react';
-// import { getAllTopics, createTopic, deleteTopic } from '../api';
-// import { parseJwt } from '../api';
+import { getAllTopics, createTopic, deleteTopic, parseJwt } from '../api';
 
 function TopicList() {
     const [topics, setTopics] = useState([]);
@@ -10,19 +9,13 @@ function TopicList() {
     const [showModal, setShowModal] = useState(false);
 
     const token = localStorage.getItem('access_token');
-    // const decoded = token ? parseJwt(token) : null;
-    const decoded = null; // временно не декодируем токен
+    const decoded = token ? parseJwt(token) : null;
     const isAdmin = decoded?.role === 'ADMIN';
 
     useEffect(() => {
         async function fetchTopics() {
-            // const response = await getAllTopics();
-            // setTopics(response.data || []);
-            // временно заглушка:
-            setTopics([
-                { id: 1, title: 'Тема 1' },
-                { id: 2, title: 'Тема 2' }
-            ]);
+            const response = await getAllTopics();
+            setTopics(response.data || []);
         }
         fetchTopics();
     }, []);
@@ -30,22 +23,20 @@ function TopicList() {
     const handleCreateTopic = async (e) => {
         e.preventDefault();
         if (newTitle.trim() && newDescription.trim()) {
-            //await createTopic(newTitle, newDescription);
+            await createTopic(newTitle, newDescription);
             setNewTitle('');
             setNewDescription('');
-            //const response = await getAllTopics();
-            //setTopics(response.data || []);
+            const response = await getAllTopics();
+            setTopics(response.data || []);
             setShowModal(false);
         }
     };
 
     const handleDelete = async (id) => {
         if (window.confirm('Удалить тему?')) {
-            // await deleteTopic(id);
-            // const response = await getAllTopics();
-            // setTopics(response.data || []);
-            // временно просто убираем тему из списка:
-            setTopics(prev => prev.filter(t => t.id !== id));
+            await deleteTopic(id);
+            const response = await getAllTopics();
+            setTopics(response.data || []);
         }
     };
 

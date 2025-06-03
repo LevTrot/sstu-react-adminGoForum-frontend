@@ -1,7 +1,7 @@
 // src/components/PostList.jsx
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-//import { getAllPosts, getPostsByTopic, createPost, getAllTopics, deletePost, parseJwt } from '../api'
+import { getAllPosts, getPostsByTopic, createPost, getAllTopics, deletePost, parseJwt } from '../api'
 
 export default function PostList() {
     const { topicId } = useParams()
@@ -10,23 +10,14 @@ export default function PostList() {
     const [newContent, setNewContent] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [topicTitle, setTopicTitle] = useState('')
-    // Имитация токена и роли ADMIN для проверки isAdmin
     const token = localStorage.getItem('access_token')
-    // Заглушка для parseJwt
-    const parseJwt = (token) => {
-        try {
-            return JSON.parse(atob(token.split('.')[1]))
-        } catch {
-            return null
-        }
-    }
     const decoded = token && parseJwt(token)
     const isAdmin = decoded?.role === 'ADMIN'
 
-    /*useEffect(() => {
+    useEffect(() => {
         async function fetchPosts() {
             const res = topicId ? await getPostsByTopic(topicId) : await getAllPosts()
-            setPosts(res.data || [])
+            setPosts(res.data.data || [])
         }
         fetchPosts()
     }, [topicId])
@@ -49,7 +40,7 @@ export default function PostList() {
             setNewTitle('')
             setNewContent('')
             const res = await getPostsByTopic(topicId)
-            setPosts(res.data || [])
+            setPosts(res.data.data || [])
             setIsModalOpen(false)
         }
     }
@@ -58,96 +49,13 @@ export default function PostList() {
         if (window.confirm('Удалить пост?')) {
             await deletePost(id)
             const res = topicId ? await getPostsByTopic(topicId) : await getAllPosts()
-            setPosts(res.data || [])
-        }
-    }
-
-    const closeModal = e => {
-        if (e.target.classList.contains('modal-overlay')) setIsModalOpen(false)
-    }*/
-    //ИМИТАЦИЯ!!! ДО РЕТЮРНА!!
-    useEffect(() => {
-        async function fetchPosts() {
-            if (topicId) {
-                setPosts([
-                    {
-                        id: 1,
-                        topic_id: topicId,
-                        title: 'Тема поста 1',
-                        content: 'Пример содержимого поста номер один для темы ' + topicId,
-                        username: 'user1',
-                        timestamp: Date.now() - 1000000,
-                    },
-                    {
-                        id: 2,
-                        topic_id: topicId,
-                        title: 'Тема поста 2',
-                        content: 'Еще один пример содержимого поста для темы ' + topicId,
-                        username: 'user2',
-                        timestamp: Date.now() - 500000,
-                    },
-                ])
-            } else {
-                setPosts([
-                    {
-                        id: 3,
-                        topic_id: 'default',
-                        title: 'Общий пост 1',
-                        content: 'Содержимое общего поста без темы',
-                        username: 'admin',
-                        timestamp: Date.now() - 2000000,
-                    },
-                ])
-            }
-        }
-        fetchPosts()
-    }, [topicId])
-
-    useEffect(() => {
-        if (!topicId) return
-
-        async function fetchTopic() {
-            const fakeTopics = [
-                { id: '1', title: 'Тема 1' },
-                { id: '2', title: 'Тема 2' },
-                { id: '3', title: 'Тема 3' },
-            ]
-            const topic = fakeTopics.find(t => String(t.id) === topicId)
-            setTopicTitle(topic?.title || 'Неизвестная тема')
-        }
-
-        fetchTopic()
-    }, [topicId])
-
-    const handleCreate = async e => {
-        e.preventDefault()
-        if (!topicId) return
-        if (newTitle.trim() && newContent.trim()) {
-            const newPost = {
-                id: Date.now(),
-                topic_id: topicId,
-                title: newTitle,
-                content: newContent,
-                username: 'current_user',
-                timestamp: Date.now(),
-            }
-            setPosts(prev => [newPost, ...prev])
-            setIsModalOpen(false)
-            setNewTitle('')
-            setNewContent('')
-        }
-    }
-
-    const handleDelete = async id => {
-        if (window.confirm('Удалить пост?')) {
-            setPosts(prev => prev.filter(post => post.id !== id))
+            setPosts(res.data.data || [])
         }
     }
 
     const closeModal = e => {
         if (e.target.classList.contains('modal-overlay')) setIsModalOpen(false)
     }
-
 
     return (
         <div>

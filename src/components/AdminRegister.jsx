@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-//import { registerAdmin } from '../api';
+import { registerAdmin } from '../api';
 
 function AdminRegister() {
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
@@ -11,8 +12,8 @@ function AdminRegister() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            //await registerAdmin(username, password);
-            console.log('[ЗАГЛУШКА] Зарегистрирован админ:', username);
+            await registerAdmin(username, email, password);
+            alert('Вы успешно зарегистрировались!');
             navigate('/login');
         } catch (err) {
             setError('Ошибка при регистрации админа');
@@ -28,6 +29,13 @@ function AdminRegister() {
                     placeholder="Имя пользователя"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    required
+                />
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                 />
                 <input
