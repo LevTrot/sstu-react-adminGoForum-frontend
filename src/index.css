@@ -2,6 +2,7 @@
 /* Styling for the post list container */
 .post-list {
     margin-top: 20px;
+    max-width: 85%;
 }
 
 /* Individual post item styling */

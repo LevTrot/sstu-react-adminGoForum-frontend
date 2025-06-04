@@ -49,7 +49,7 @@ function Chat({ setIsPanelOpen, username, isAuthenticated }) {
 
     ws.onopen = () => {
       console.log('WebSocket соединение установлено');
-      ws.send(JSON.stringify({ content: 'ping' }));
+      //ws.send(JSON.stringify({ content: 'ping' }));
     };
 
     ws.onmessage = (event) => {
